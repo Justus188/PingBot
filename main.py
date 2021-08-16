@@ -33,6 +33,7 @@ async def event(ctx, timeto, role, *, event):
   for Role in ctx.guild.roles:
     if role == Role.name:
       role = Role
+      break
   
   if isinstance(role, str):
     await ctx.send('Role not found')
