@@ -1,3 +1,6 @@
+https://discordpy.readthedocs.io/en/stable/api.html
+https://discordpy.readthedocs.io/en/stable/ext/commands/api.html
+
 https://www.freecodecamp.org/news/create-a-discord-bot-with-python/
 https://realpython.com/how-to-make-a-discord-bot-python/
 

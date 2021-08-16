@@ -21,6 +21,14 @@ async def on_ready():
 
 @bot.command()
 async def event(ctx, timeto, role, *, event):
+  """"
+  Set a reminder ping for a role for your event.
+  
+  Syntax: .event <time to event without spaces> <role name without @> <event name, spaces allowed>
+
+  Example: .event 1h30m dwarves Deep Rock Galactic
+  """
+  
   ## Check for valid timeto and convert to seconds
   try:
     seconds = parse(timeto)
