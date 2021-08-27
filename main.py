@@ -1,64 +1,62 @@
 ## Logging
-import logging
+#import logging
 
-logging.basicConfig(level=logging.INFO)
+#logging.basicConfig(level=logging.INFO)
 
 ## Body
-import discord
 from discord.ext import commands
 from asyncio import sleep
-import datetime
+from datetime import timedelta
 from pytimeparse import parse
 import os
 
 bot = commands.Bot(command_prefix='.')
 
-# https://discord.com/api/oauth2/authorize?client_id=876459480768999444&permissions=206912&scope=bot
+def get_role(ctx, role):
+  """Check guild in ctx for rolename and returns role object, return None if not found."""
+  for Role in ctx.guild.roles:
+    if role == Role.name:
+      return Role
+  
+  return None
 
 @bot.event
 async def on_ready():
-  print('Pingbot has loaded as {0.user}'.format(bot))
+  print(f'Pingbot has loaded as {bot.user} in {[guild.name for guild in bot.guilds]}')
 
 @bot.command()
 async def event(ctx, timeto, role, *, event):
-  """"
-  Set a reminder ping for a role for your event.
-  
-  Syntax: .event <time to event without spaces> <role name without @> <event name, spaces allowed>
-
-  Example: .event 1h30m dwarves Deep Rock Galactic
-  """
+  """"Pings role after set amount of time."""
   
   ## Check for valid timeto and convert to seconds
   try:
     seconds = parse(timeto)
-    # https://github.com/wroberts/pytimeparse
   except:
     await ctx.send('Invalid delay')
     return
 
   ## Check for valid role and get role object
-  for Role in ctx.guild.roles:
-    if role == Role.name:
-      role = Role
-      break
-  
-  if isinstance(role, str):
+  role = get_role(ctx, role)
+  if role is None:
     await ctx.send('Role not found')
     return
 
   ## Verify Request
-  await ctx.send(f'In {str(datetime.timedelta(seconds=seconds))} ping @{role} for {event}.')
+  await ctx.send(f'In {str(timedelta(seconds=seconds))} ping @{role} for {event}.')
 
   ## Wait and Send Reminder
   await sleep(seconds)
   await ctx.send(f'{event}! {role.mention}')
 
-## Keep the bot active on replit using uptimerrobot
-# https://www.freecodecamp.org/news/create-a-discord-bot-with-python/
-# https://uptimerobot.com/dashboard#mainDashboard
-from keep_alive import keep_alive
-keep_alive()
-
 ## Run
-bot.run(os.environ['token'])
+if __name__ == '__main__':
+  ## Keep the bot active on replit using uptimerrobot
+  from keep_alive import keep_alive
+  keep_alive()
+  
+  bot.load_extension('mudae')
+
+  print('Extensions: ', bot.extensions.keys())
+  print('Cogs: ', bot.cogs.keys())
+
+  bot.run(os.environ['token'])
