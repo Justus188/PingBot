@@ -2,12 +2,17 @@ from discord.ext import commands, tasks
 from main import get_role
 from pytimeparse import parse
 from asyncio import sleep
+from datetime import timedelta, datetime
 
 class MudaeCog(commands.Cog):
   def __init__(self, bot):
     self.bot = bot
     self.role = None
     self.claim_time = None
+
+    print('MudaeCog Initialised')
+
+    ## TODO: Load JSON
 
   ## Roll and claim loop
   @commands.command()
@@ -37,7 +42,9 @@ class MudaeCog(commands.Cog):
       await ctx.send('Invalid time to claim')
       return
 
-    await ctx.send(f'Mudae Pingbot activated: Ping {self.role.mention} every hour for rolls and every 3 hours for claims.')
+    await ctx.send(f'Mudae Pingbot activated: Ping @{role} every hour for rolls and every 3 hours for claims.')
+
+    ## TODO: Write to JSON
 
     #rolls reset every hour, claims every 3 hours. Possibilities:
     #  Claim is 0h (rounded down) away

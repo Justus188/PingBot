@@ -30,3 +30,22 @@ async def on_member_join(member):
   )
 ```
 
+Learning Points:
+* Learning about discord py and ascyncio
+* Modularization and extensions
+
+Todo:
+* Hosting and downtime
+  * Troubleshooting to identify problem
+  * Possible solutions:
+    * Save data / request log to file, read on initialization
+      * Consideration: Hosted in github / replit (public)
+      * Sensitive data?
+    * Find a better hosting service
+* Input parsing for discord commands
+  * Input flexibility vs implementation difficulty?
+  * Context: Personal / Friend Usage, all friends familiar with programming
+    * Lean towards ease of implementation for MVP
+  * Explore: NLP packages for more flexibility
+    * https://dateparser.readthedocs.io/en/latest/
+    * Named Entity Recognition to extract more flexibily: https://spacy.io/usage/linguistic-features#section-named-entities
