@@ -17,24 +17,6 @@ def get_role(ctx, role):
   
   return None
 
-def active_append(filename, content):
-  """Opens json list and appends content to the list."""
-  with open(filename, 'r+') as f:
-    active = json.load(f)
-    active.append(content)
-    f.seek(0)
-    json.dump(active, f)
-
-def active_remove(filename, content_id):
-  """Opens json list and removes entry with id = content_id from list."""
-  with open(filename, 'r+') as f:
-    active = json.load(f)
-    active = list(filter(lambda i: i['id'] != content_id, active))
-    
-    f.seek(0)
-    json.dump(active, f)
-    f.truncate()
-
 
 ## Body
 @bot.event
@@ -43,11 +25,18 @@ async def on_ready():
   with open('main_active.json', 'r') as f:
     active = json.load(f)
 
-  print(f'Pingbot has loaded as {bot.user} in {[guild.name for guild in bot.guilds]}, currently pending {len(active)} messages')
+  print(f'Pingbot has loaded as {bot.user} in {[guild.name for guild in bot.guilds]}, loading {len(active)} pending messages')
 
   ## Trigger logged pending messages
   for entry in active:
     await event_message(entry)
+  
+  print(f'Pingbot: {len(active)} pending messages loaded.')
+
+  bot.load_extension('mudae')
+
+  print('Extensions: ', list(bot.extensions.keys()))
+  print('Cogs: ', list(bot.cogs.keys()))
 
 @bot.command()
 async def event(ctx, timeto, role, *, event):
@@ -71,7 +60,11 @@ async def event(ctx, timeto, role, *, event):
                'utc': (datetime.utcnow() + timedelta(seconds=seconds)).strftime('%y%m%d%H%M%S%f'),
                'event': event}
   
-  active_append('main_active.json', new_entry)
+  with open('main_active.json', 'r+') as f:
+    active = json.load(f)
+    active.append(new_entry)
+    f.seek(0)
+    json.dump(active, f)
 
   ## Verification message and action
   await ctx.send(f'In {str(timedelta(seconds=seconds))} ping @{role} for {event}.')
@@ -86,8 +79,14 @@ async def event_message(event_dict):
   role = guild.get_role(event_dict['role'])
 
   await channel.send(f'{event_dict["event"]}! {role.mention}')
-  active_remove('main_active.json', event_dict['id'])
 
+  with open('main_active.json', 'r+') as f:
+    active = json.load(f)
+    active = list(filter(lambda i: i['id'] != event_dict['id'], active))
+    
+    f.seek(0)
+    json.dump(active, f)
+    f.truncate()
 
 ## Run
 if __name__ == '__main__':
@@ -95,9 +94,4 @@ if __name__ == '__main__':
   from keep_alive import keep_alive
   keep_alive()
   
-  bot.load_extension('mudae')
-
-  print('Extensions: ', bot.extensions.keys())
-  print('Cogs: ', bot.cogs.keys())
-
   bot.run(os.environ['token'])

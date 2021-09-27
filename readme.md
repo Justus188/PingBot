@@ -25,7 +25,3 @@ Pings @dwarves in 1h20min for Deep Rock Galactic time!
 * Intended for reminders for the gatcha bot Mudae
 * Pings role every 1h for rolls and 3h for claims in the channel it is called.
 * Time to claim is parsed using Will Roberts' pytimeparse (https://github.com/wroberts/pytimeparse), so it's pretty flexible as long as there is no whitespace.
-
-### TODO
-* Functionalise file append, removal
-* Add file management for mudae

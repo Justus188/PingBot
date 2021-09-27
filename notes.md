@@ -4,6 +4,19 @@ https://discordpy.readthedocs.io/en/stable/ext/commands/api.html
 https://www.freecodecamp.org/news/create-a-discord-bot-with-python/
 https://realpython.com/how-to-make-a-discord-bot-python/
 
+
+Mudae_cog:
+Rolls reset every hour, claims every 3 hours. Possibilities:
+* Claim is 0h (rounded down) away
+* Claim is 1h (rounded down) away - 1 roll to claim
+* Claim is 2h (rounded down) away - 2 rolls to claim
+* 1h is 60*60 seconds
+With the downtime workaround, logic needs to include -ves
+* // rounds negatives down
+* -3 - less than 3h ago, next one is claim; -3 % 3 = 0
+* -2 - less than 2h ago, 1 rolls to claim;  -2 % 3 = 1
+* -1 - less than 1h ago, just after claim = 2 rolls to claim; -1 % 3 = 2
+
 ``` Logger code block
 import logging
 
