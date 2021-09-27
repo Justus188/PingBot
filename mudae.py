@@ -1,8 +1,9 @@
 from discord.ext import commands, tasks
-from main import get_role
+from main import get_role, active_append, active_remove
 from pytimeparse import parse
 from asyncio import sleep
 from datetime import timedelta, datetime
+import json
 
 class MudaeCog(commands.Cog):
   def __init__(self, bot):
@@ -10,9 +11,13 @@ class MudaeCog(commands.Cog):
     self.role = None
     self.claim_time = None
 
-    print('MudaeCog Initialised')
+    with open('mudae_active.json', 'r') as f:
+      active = json.load(f)
+    
+    print(f'MudaeCog Initialised, pending {len(active)} messages.')
 
-    ## TODO: Load JSON
+    for entry in active:
+      pass
 
   ## Roll and claim loop
   @commands.command()
