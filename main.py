@@ -1,6 +1,6 @@
 ## Body
 from discord.ext import commands
-from asyncio import sleep
+from asyncio import sleep, gather
 from datetime import timedelta, datetime
 from pytimeparse import parse
 import os
@@ -28,8 +28,7 @@ async def on_ready():
   print(f'Pingbot has loaded as {bot.user} in {[guild.name for guild in bot.guilds]}, loading {len(active)} pending messages')
 
   ## Trigger logged pending messages
-  for entry in active:
-    await event_message(entry)
+  await gather(*[event_message(k, v) for k, v in active.items()])
   
   print(f'Pingbot: {len(active)} pending messages loaded.')
 
@@ -55,22 +54,23 @@ async def event(ctx, timeto, role, *, event):
     return
 
   ## Log to json
-  new_entry = {'id': datetime.utcnow().strftime('%y%m%d%H%M%S%f'),
-               'guild': ctx.guild.id, 'channel': ctx.channel.id, 'role': role.id,
+  new_entry = {'guild': ctx.guild.id, 'channel': ctx.channel.id, 'role': role.id,
                'utc': (datetime.utcnow() + timedelta(seconds=seconds)).strftime('%y%m%d%H%M%S%f'),
                'event': event}
-  
+  event_id = datetime.utcnow().strftime('%y%m%d%H%M%S%f') + str(ctx.guild.id)
+
+
   with open('main_active.json', 'r+') as f:
     active = json.load(f)
-    active.append(new_entry)
+    active[event_id] = new_entry
     f.seek(0)
     json.dump(active, f)
 
   ## Verification message and action
   await ctx.send(f'In {str(timedelta(seconds=seconds))} ping @{role} for {event}.')
-  await event_message(new_entry)
+  await event_message(event_id, new_entry)
 
-async def event_message(event_dict):
+async def event_message(event_id, event_dict):
   seconds = (datetime.strptime(event_dict['utc'],'%y%m%d%H%M%S%f') - datetime.utcnow()).total_seconds()
   await sleep(seconds)
 
@@ -82,7 +82,7 @@ async def event_message(event_dict):
 
   with open('main_active.json', 'r+') as f:
     active = json.load(f)
-    active = list(filter(lambda i: i['id'] != event_dict['id'], active))
+    active.pop(event_id)
     
     f.seek(0)
     json.dump(active, f)
