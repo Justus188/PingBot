@@ -10,13 +10,12 @@ bot = commands.Bot(command_prefix='.')
 
 ## Helpers
 def get_role(ctx, role):
-  """Check guild in ctx for rolename and returns role object, return None if not found."""
+  """Check guild in ctx for rolename and returns role object, return None if not found"""
   for Role in ctx.guild.roles:
     if role == Role.name:
       return Role
   
   return None
-
 
 ## Body
 @bot.event
@@ -54,11 +53,10 @@ async def event(ctx, timeto, role, *, event):
     return
 
   ## Log to json
-  new_entry = {'guild': ctx.guild.id, 'channel': ctx.channel.id, 'role': role.id,
+  new_entry = {'guild': str(ctx.guild.id), 'channel': ctx.channel.id, 'role': role.id,
                'utc': (datetime.utcnow() + timedelta(seconds=seconds)).strftime('%y%m%d%H%M%S%f'),
                'event': event}
   event_id = datetime.utcnow().strftime('%y%m%d%H%M%S%f') + str(ctx.guild.id)
-
 
   with open('main_active.json', 'r+') as f:
     active = json.load(f)
@@ -71,10 +69,11 @@ async def event(ctx, timeto, role, *, event):
   await event_message(event_id, new_entry)
 
 async def event_message(event_id, event_dict):
+  """Message logic"""
   seconds = (datetime.strptime(event_dict['utc'],'%y%m%d%H%M%S%f') - datetime.utcnow()).total_seconds()
   await sleep(seconds)
 
-  guild = next(i for i in bot.guilds if i.id == event_dict['guild'])
+  guild = next(i for i in bot.guilds if str(i.id) == event_dict['guild'])
   channel = guild.get_channel(event_dict['channel'])
   role = guild.get_role(event_dict['role'])
 
